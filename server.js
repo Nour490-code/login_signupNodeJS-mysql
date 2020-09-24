@@ -14,10 +14,13 @@ db.connect((err) => err ? console.log(err) : console.log('DB Connected..'))
 app.set("view engine", "ejs");
 app.use(express.static('public'));
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 app.get('/',(req,res) => res.render('index'))
+app.get('/login',(req,res) => res.render('login'))
+app.get('/signup',(req,res) => res.render('index'))
 app.get('/dashboard',(req,res) => res.render('dashboard'))
+
+
 app.post('/signup',(req,res) => {
     const user = {
         email: req.body.email,
@@ -25,7 +28,14 @@ app.post('/signup',(req,res) => {
     }
     let sql = 'INSERT INTO users SET ?';
     db.query(sql, user, (err, result) => {
-        err ? console.log(err) : res.redirect('dashboard');
+        err ? console.log(err) : res.render('dashboard')
+    });
+})
+
+app.post('/login',(req,res) => {
+    db.query('SELECT * FROM users WHERE email = ? AND password = ?', [req.body.email, req.body.password] , (err, result) => {
+        if (err) console.log(err)
+        res.send(result)
     });
 })
 
